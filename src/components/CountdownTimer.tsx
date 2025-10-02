@@ -9,8 +9,20 @@ interface TimeLeft {
 
 export const CountdownTimer = () => {
   const calculateTimeLeft = (): TimeLeft => {
-    // Target: Oct 31, 2024, 23:59 Africa/Lagos (UTC+1)
-    const targetDate = new Date("2024-10-31T23:59:00+01:00");
+    // Get or set the target date (30 days from first page load)
+    let targetDate: Date;
+    const storedTarget = localStorage.getItem('ctg-countdown-target');
+    
+    if (storedTarget) {
+      targetDate = new Date(storedTarget);
+    } else {
+      // Set to 30 days from now in Africa/Lagos timezone (UTC+1)
+      const now = new Date();
+      targetDate = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000));
+      // Store for consistency across sessions
+      localStorage.setItem('ctg-countdown-target', targetDate.toISOString());
+    }
+    
     const now = new Date();
     const difference = targetDate.getTime() - now.getTime();
 
