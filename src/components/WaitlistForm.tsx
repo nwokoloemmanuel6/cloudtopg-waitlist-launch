@@ -75,7 +75,7 @@ export const WaitlistForm = () => {
       <input type="hidden" name="_subject" value="CTG Waitlist Signup" />
       
       <div className="space-y-2">
-        <Label htmlFor="fullName" className="text-sm font-medium">
+        <Label htmlFor="fullName" className="text-sm font-medium text-black">
           Full Name <span className="text-primary">*</span>
         </Label>
         <Input
@@ -86,12 +86,12 @@ export const WaitlistForm = () => {
           value={formData.fullName}
           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
           placeholder="Enter your full name"
-          className="h-12 bg-input border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium">
+        <Label htmlFor="email" className="text-sm font-medium text-black">
           Email Address <span className="text-primary">*</span>
         </Label>
         <Input
@@ -102,12 +102,12 @@ export const WaitlistForm = () => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="your.email@example.com"
-          className="h-12 bg-input border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber" className="text-sm font-medium">
+        <Label htmlFor="phoneNumber" className="text-sm font-medium text-black">
           Phone Number <span className="text-primary">*</span>
         </Label>
         <Input
@@ -118,7 +118,7 @@ export const WaitlistForm = () => {
           value={formData.phoneNumber}
           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
           placeholder="+234 XXX XXX XXXX"
-          className="h-12 bg-input border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
@@ -139,7 +139,7 @@ export const WaitlistForm = () => {
         <input type="hidden" name="consent" value={consent ? "true" : "false"} />
         <label 
           onClick={() => setConsent(!consent)}
-          className="text-sm text-muted-foreground cursor-pointer leading-tight"
+          className="text-sm text-black cursor-pointer leading-tight"
         >
           I agree to receive emails about Cloud Top G admissions, assessments, and program updates. <span className="text-primary">*</span>
         </label>

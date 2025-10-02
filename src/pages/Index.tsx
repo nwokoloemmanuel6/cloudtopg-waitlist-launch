@@ -38,20 +38,20 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Image with Overlaid Text */}
             <div className="order-1 lg:order-1">
-              <div className="relative">
+              <div className="relative h-full">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-3xl" />
                 {/* White accent border/glow */}
                 <div className="absolute inset-0 bg-white/5 rounded-2xl border border-white/10" />
                 <img
                   src={heroImage}
                   alt="Cloud Engineering Excellence"
-                  className="relative rounded-2xl shadow-2xl w-full object-cover aspect-[4/3]"
+                  className="relative rounded-2xl shadow-2xl w-full h-full object-cover"
                 />
-                {/* Dark gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30 rounded-2xl" />
+                {/* Bottom gradient overlay for text readability - only at the bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-2xl" />
                 
-                {/* Overlaid Content */}
-                <div className="absolute inset-0 p-6 md:p-8 lg:p-10 flex flex-col justify-center">
+                {/* Overlaid Content - anchored to bottom */}
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 lg:p-10 flex flex-col justify-end">
                   <div className="space-y-6">
                     <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
                       <span className="relative flex h-2 w-2">
@@ -93,10 +93,10 @@ const Index = () => {
 
             {/* Right: Form Only */}
             <div className="order-2 lg:order-2" id="waitlist-form">
-              <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl p-6 md:p-8 shadow-xl">
+              <div className="bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-6 md:p-8 shadow-xl">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold mb-2 text-gray-900">Join the Waitlist</h2>
-                  <p className="text-sm text-gray-600">
+                  <h2 className="text-2xl font-bold mb-2 text-foreground">Join the Waitlist</h2>
+                  <p className="text-sm text-muted-foreground">
                     Secure your spot and lock in exclusive bonuses
                   </p>
                 </div>
@@ -161,22 +161,22 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">9 Months</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">9 Months</div>
               <div className="text-sm text-muted-foreground">Intensive Training</div>
             </div>
             <div className="hidden md:block w-px h-12 bg-border" />
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">Live</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">Live</div>
               <div className="text-sm text-muted-foreground">Expert Mentorship</div>
             </div>
             <div className="hidden md:block w-px h-12 bg-border" />
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">Portfolio</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">Portfolio</div>
               <div className="text-sm text-muted-foreground">Real Projects</div>
             </div>
             <div className="hidden md:block w-px h-12 bg-border" />
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">Career</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">Career</div>
               <div className="text-sm text-muted-foreground">Ready Graduate</div>
             </div>
           </div>
