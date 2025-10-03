@@ -38,7 +38,7 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Image with Overlaid Text */}
             <div className="order-1 lg:order-1">
-              <div className="relative h-full">
+              <div className="relative h-full min-h-[600px] lg:min-h-0">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-3xl" />
                 {/* White accent border/glow */}
                 <div className="absolute inset-0 bg-white/5 rounded-2xl border border-white/10" />
@@ -93,10 +93,10 @@ const Index = () => {
 
             {/* Right: Form Only */}
             <div className="order-2 lg:order-2" id="waitlist-form">
-              <div className="bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-6 md:p-8 shadow-xl">
+              <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-xl">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold mb-2 text-foreground">Join the Waitlist</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className="text-2xl font-bold mb-2 text-black">Join the Waitlist</h2>
+                  <p className="text-sm text-black/70">
                     Secure your spot and lock in exclusive bonuses
                   </p>
                 </div>

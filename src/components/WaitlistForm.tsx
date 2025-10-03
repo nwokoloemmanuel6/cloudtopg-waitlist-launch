@@ -86,7 +86,7 @@ export const WaitlistForm = () => {
           value={formData.fullName}
           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
           placeholder="Enter your full name"
-          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black/70 border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
@@ -102,7 +102,7 @@ export const WaitlistForm = () => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="your.email@example.com"
-          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black/70 border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
@@ -118,7 +118,7 @@ export const WaitlistForm = () => {
           value={formData.phoneNumber}
           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
           placeholder="+234 XXX XXX XXXX"
-          className="h-12 bg-white text-black placeholder:text-black border-border focus:border-primary focus:ring-primary"
+          className="h-12 bg-white text-black placeholder:text-black/70 border-border focus:border-primary focus:ring-primary"
         />
       </div>
 
@@ -156,7 +156,7 @@ export const WaitlistForm = () => {
         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
       </Button>
 
-      <p className="text-xs text-center text-muted-foreground">
+      <p className="text-xs text-center text-black/60">
         No spam — unsubscribe anytime.{" "}
         <a href="/privacy" className="text-primary hover:underline">
           Privacy Policy
