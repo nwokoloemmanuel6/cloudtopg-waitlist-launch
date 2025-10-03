@@ -35,10 +35,10 @@ const Index = () => {
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-[45%_55%] gap-12 items-stretch">
             {/* Left: Image with Overlaid Text */}
-            <div className="order-1 lg:order-1">
-              <div className="relative h-full min-h-[600px] lg:min-h-0">
+            <div className="order-1 lg:order-1 flex">
+              <div className="relative w-full min-h-[600px] lg:min-h-0 flex-1">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-3xl" />
                 {/* White accent border/glow */}
                 <div className="absolute inset-0 bg-white/5 rounded-2xl border border-white/10" />
