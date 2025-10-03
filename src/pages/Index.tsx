@@ -53,14 +53,6 @@ const Index = () => {
                 {/* Overlaid Content - anchored to bottom */}
                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 lg:p-10 flex flex-col justify-end">
                   <div className="space-y-6">
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                      </span>
-                      <span className="text-sm font-medium text-white">Only 30 Slots Available</span>
-                    </div>
-
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-lg">
                       Become a world-class{" "}
                       <span className="text-primary drop-shadow-lg">cloud engineer</span>
@@ -93,7 +85,18 @@ const Index = () => {
 
             {/* Right: Form Only */}
             <div className="order-2 lg:order-2" id="waitlist-form">
-              <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-xl">
+              <div className="relative bg-white border border-border rounded-2xl p-6 md:p-8 shadow-xl">
+                {/* Only 30 Slots Badge - Mobile: centered above title, Desktop: top-right */}
+                <div className="flex justify-center lg:justify-end mb-4 lg:mb-0 lg:absolute lg:top-3 lg:right-3" aria-live="polite">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full px-4 py-2 animate-pulse">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <span className="text-sm font-medium text-primary">Only 30 Slots Available</span>
+                  </div>
+                </div>
+                
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold mb-2 text-black">Join the Waitlist</h2>
                   <p className="text-sm text-black/70">
