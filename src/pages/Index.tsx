@@ -206,7 +206,7 @@ const Index = () => {
           </Button>
 
           <p className="text-sm text-muted-foreground">
-            Join 200+ aspiring cloud engineers already on the waitlist
+            Join aspiring cloud engineers already on the waitlist
           </p>
         </div>
       </section>
