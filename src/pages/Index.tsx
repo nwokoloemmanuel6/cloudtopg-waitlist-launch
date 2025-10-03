@@ -28,14 +28,14 @@ const Index = () => {
       <section className="relative overflow-x-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         
-        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 py-12">
+        <div className="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 2xl:px-14 py-12">
           {/* Logo */}
           <div className="mb-12">
             <img src={logo} alt="Cloud Top G" className="h-10 md:h-12" />
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
             {/* Left: Image with Overlaid Text */}
             <div className="order-1 lg:order-1 flex">
               <div className="relative w-full min-h-[600px] lg:min-h-0 flex-1">
@@ -84,7 +84,7 @@ const Index = () => {
             </div>
 
             {/* Right: Form Only */}
-            <div className="order-2 lg:order-2 mr-6 lg:mr-12 pl-0 lg:pl-6" id="waitlist-form">
+            <div className="order-2 lg:order-2 mr-4 lg:mr-6 xl:mr-8 pl-0" id="waitlist-form">
               <div className="relative bg-white border border-border rounded-2xl w-full max-w-[700px] ml-auto p-8 lg:p-10 shadow-xl">
                 {/* Only 30 Slots Badge - Mobile: centered above title, Desktop: top-right */}
                 <div className="flex justify-center lg:justify-end mb-4 lg:mb-0 lg:absolute lg:top-3 lg:right-3" aria-live="polite">
