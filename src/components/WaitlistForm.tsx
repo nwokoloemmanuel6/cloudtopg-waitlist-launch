@@ -4,33 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-
-// Type declaration for Paystack
-declare global {
-  interface Window {
-    PaystackPop: {
-      setup: (config: {
-        key: string;
-        email: string;
-        amount: number;
-        currency: string;
-        ref: string;
-        payment_options: string;
-        metadata: {
-          custom_fields: Array<{
-            display_name: string;
-            variable_name: string;
-            value: string;
-          }>;
-        };
-        callback: (response: { reference: string }) => void;
-        onClose: () => void;
-      }) => {
-        openIframe: () => void;
-      };
-    };
-  }
-}
+import { ensurePaystackLoaded } from "@/lib/ensurePaystack";
 
 export const WaitlistForm = () => {
   const { toast } = useToast();
@@ -42,12 +16,15 @@ export const WaitlistForm = () => {
     phoneNumber: "+234",
   });
 
-  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY!;
-  const AMOUNT_KOBO = Number(import.meta.env.VITE_FEE_NGN) * 100;
+  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string | undefined;
+  const FEE_NGN = Number(import.meta.env.VITE_FEE_NGN);
+  const AMOUNT_KOBO = Math.round((isFinite(FEE_NGN) ? FEE_NGN : 0) * 100);
+  const FALLBACK_PAYMENT_PAGE = import.meta.env.VITE_PAYSTACK_PAYMENT_PAGE as string | undefined;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    // Validate consent
     if (!consent) {
       toast({
         title: "Consent Required",
@@ -59,71 +36,157 @@ export const WaitlistForm = () => {
 
     setIsSubmitting(true);
 
-    // Generate unique reference
-    const paystackRef = "CTG-" + Date.now();
-
-    // Initialize Paystack
-    const handler = window.PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: formData.email,
-      amount: AMOUNT_KOBO,
-      currency: "NGN",
-      ref: paystackRef,
-      payment_options: "card,bank,ussd,banktransfer",
-      metadata: {
-        custom_fields: [
-          {
-            display_name: "Full Name",
-            variable_name: "full_name",
-            value: formData.fullName,
-          },
-          {
-            display_name: "Phone Number",
-            variable_name: "phone",
-            value: formData.phoneNumber,
-          },
-        ],
-      },
-      callback: async (response) => {
-        // Payment successful - send to Formspree
-        try {
-          const body = new FormData();
-          body.set("email", formData.email);
-          body.set("fullName", formData.fullName);
-          body.set("phoneNumber", formData.phoneNumber);
-          body.set("paystack_ref", response.reference);
-          body.set("consent", consent ? "true" : "false");
-          body.set("_subject", "CTG Waitlist (Paid)");
-
-          await fetch("https://formspree.io/f/mdkwzdzn", {
-            method: "POST",
-            body,
-            headers: { Accept: "application/json" },
-          });
-
-          // Redirect with reference
-          window.location.href = `/thank-you?ref=${encodeURIComponent(response.reference)}`;
-        } catch (error) {
-          toast({
-            title: "Something went wrong",
-            description: "Payment successful but submission failed. Please contact support.",
-            variant: "destructive",
-          });
-          setIsSubmitting(false);
-        }
-      },
-      onClose: () => {
-        // Payment cancelled
+    try {
+      // Guard: Check if Paystack is configured
+      if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.trim() === "") {
+        console.error("Paystack public key not configured");
         toast({
-          title: "Payment cancelled",
-          description: "You can try again when you're ready.",
+          title: "Configuration Error",
+          description: "Payment system not configured. Please contact support.",
+          variant: "destructive",
         });
         setIsSubmitting(false);
-      },
-    });
+        return;
+      }
 
-    // Open Paystack modal
-    handler.openIframe();
+      if (AMOUNT_KOBO <= 0) {
+        console.error("Invalid payment amount configured");
+        toast({
+          title: "Configuration Error",
+          description: "Payment amount not configured. Please contact support.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Try to load Paystack script
+      try {
+        await ensurePaystackLoaded();
+      } catch (loadError) {
+        console.error("Failed to load Paystack:", loadError);
+        
+        // Fallback to payment page if configured
+        if (FALLBACK_PAYMENT_PAGE) {
+          const url = new URL(FALLBACK_PAYMENT_PAGE);
+          url.searchParams.set("email", formData.email);
+          url.searchParams.set("full_name", formData.fullName);
+          url.searchParams.set("phone", formData.phoneNumber);
+          window.location.href = url.toString();
+          return;
+        }
+        
+        toast({
+          title: "Payment Unavailable",
+          description: "Unable to load payment system. Please try again later.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Verify PaystackPop is available
+      if (!window.PaystackPop) {
+        console.error("PaystackPop not available after loading");
+        toast({
+          title: "Payment Unavailable",
+          description: "Payment system could not be initialized. Please try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Generate unique reference
+      const paystackRef = `CTG-${Date.now()}`;
+
+      // Initialize Paystack
+      const handler = window.PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: formData.email,
+        amount: AMOUNT_KOBO,
+        currency: "NGN",
+        ref: paystackRef,
+        payment_options: "card,bank,ussd,banktransfer",
+        metadata: {
+          custom_fields: [
+            {
+              display_name: "Full Name",
+              variable_name: "full_name",
+              value: formData.fullName,
+            },
+            {
+              display_name: "Phone Number",
+              variable_name: "phone",
+              value: formData.phoneNumber,
+            },
+          ],
+        },
+        callback: async (response: any) => {
+          // Payment successful - send to Formspree
+          try {
+            const body = new FormData();
+            body.set("email", formData.email);
+            body.set("fullName", formData.fullName);
+            body.set("phoneNumber", formData.phoneNumber);
+            body.set("paystack_ref", response?.reference ?? "");
+            body.set("consent", consent ? "true" : "false");
+            body.set("_subject", "CTG Waitlist (Paid)");
+
+            await fetch("https://formspree.io/f/mdkwzdzn", {
+              method: "POST",
+              body,
+              headers: { Accept: "application/json" },
+            });
+          } catch (error) {
+            console.warn("Formspree post failed (non-blocking):", error);
+          } finally {
+            // Always redirect with reference
+            window.location.href = `/thank-you?ref=${encodeURIComponent(response?.reference ?? "")}`;
+          }
+        },
+        onClose: () => {
+          // Payment cancelled or closed
+          toast({
+            title: "Payment cancelled",
+            description: "You can try again when you're ready.",
+          });
+          setIsSubmitting(false);
+        },
+      });
+
+      // Open Paystack modal
+      try {
+        handler.openIframe();
+      } catch (openError) {
+        console.error("Paystack openIframe error:", openError);
+        
+        // Fallback if inline blocked in preview sandbox
+        if (FALLBACK_PAYMENT_PAGE) {
+          const url = new URL(FALLBACK_PAYMENT_PAGE);
+          url.searchParams.set("email", formData.email);
+          url.searchParams.set("full_name", formData.fullName);
+          url.searchParams.set("phone", formData.phoneNumber);
+          window.location.href = url.toString();
+          return;
+        }
+        
+        toast({
+          title: "Unable to Open Payment",
+          description: "Could not open payment window. Please try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Unexpected error in payment flow:", error);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again or contact support.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+    }
   };
 
   return (
