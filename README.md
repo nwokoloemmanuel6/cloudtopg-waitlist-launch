@@ -60,6 +60,39 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Payments (Paystack)
+
+This project integrates Paystack for collecting waitlist application fees. 
+
+### Environment Setup
+
+Create a `.env` file in the root directory (based on `.env.example`):
+
+```env
+VITE_PAYSTACK_PUBLIC_KEY=pk_live_a1b065ab9ff7a77972b50678d8211d74ea80a767
+VITE_FEE_NGN=15000
+```
+
+- `VITE_PAYSTACK_PUBLIC_KEY`: Your Paystack public key (safe for frontend use)
+- `VITE_FEE_NGN`: Application fee amount in Nigerian Naira
+
+### Manual Slot Counter
+
+The "Only X Slots Available" badge is manually controlled. To update the number:
+
+1. Open `src/pages/Index.tsx`
+2. Find the constant: `const MANUAL_SLOTS_AVAILABLE = 30;`
+3. Update the number as needed
+
+### Payment Flow
+
+1. User fills waitlist form
+2. Clicking "Join Waitlist" opens Paystack inline checkout
+3. On successful payment:
+   - Lead data is sent to Formspree with `paystack_ref`
+   - User is redirected to `/thank-you?ref=<paystack_reference>`
+4. On cancel/close: User can retry the payment
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/9a40d734-3008-4abc-be81-adf63ece8f0d) and click on Share -> Publish.

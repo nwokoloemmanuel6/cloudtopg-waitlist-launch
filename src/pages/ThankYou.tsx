@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Calendar, Gift } from "lucide-react";
 import logo from "@/assets/logo.svg";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const ThankYou = () => {
+  const [searchParams] = useSearchParams();
+  const paymentRef = searchParams.get("ref");
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center space-y-8 py-12">
@@ -28,6 +31,12 @@ const ThankYou = () => {
           <p className="text-xl text-muted-foreground max-w-xl mx-auto">
             Welcome to the Cloud Top G Cohort 2026 journey. Your bonuses are locked in.
           </p>
+          {paymentRef && (
+            <div className="bg-card/50 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
+              <p className="text-sm text-muted-foreground">Payment Reference</p>
+              <p className="text-lg font-mono font-semibold text-primary break-all">{paymentRef}</p>
+            </div>
+          )}
         </div>
 
         {/* Bonuses Locked */}

@@ -5,6 +5,33 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
+// Type declaration for Paystack
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup: (config: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref: string;
+        payment_options: string;
+        metadata: {
+          custom_fields: Array<{
+            display_name: string;
+            variable_name: string;
+            value: string;
+          }>;
+        };
+        callback: (response: { reference: string }) => void;
+        onClose: () => void;
+      }) => {
+        openIframe: () => void;
+      };
+    };
+  }
+}
+
 export const WaitlistForm = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,6 +41,9 @@ export const WaitlistForm = () => {
     fullName: "",
     phoneNumber: "+234",
   });
+
+  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY!;
+  const AMOUNT_KOBO = Number(import.meta.env.VITE_FEE_NGN) * 100;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,43 +59,71 @@ export const WaitlistForm = () => {
 
     setIsSubmitting(true);
 
-    const form = e.currentTarget;
-    const formDataToSend = new FormData(form);
-    
-    // Add consent as a proper form field
-    formDataToSend.set("consent", consent ? "true" : "false");
+    // Generate unique reference
+    const paystackRef = "CTG-" + Date.now();
 
-    try {
-      const response = await fetch("https://formspree.io/f/mdkwzdzn", {
-        method: "POST",
-        body: formDataToSend,
-        headers: {
-          Accept: "application/json",
-        },
-      });
+    // Initialize Paystack
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: formData.email,
+      amount: AMOUNT_KOBO,
+      currency: "NGN",
+      ref: paystackRef,
+      payment_options: "card,bank,ussd,banktransfer",
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Full Name",
+            variable_name: "full_name",
+            value: formData.fullName,
+          },
+          {
+            display_name: "Phone Number",
+            variable_name: "phone",
+            value: formData.phoneNumber,
+          },
+        ],
+      },
+      callback: async (response) => {
+        // Payment successful - send to Formspree
+        try {
+          const body = new FormData();
+          body.set("email", formData.email);
+          body.set("fullName", formData.fullName);
+          body.set("phoneNumber", formData.phoneNumber);
+          body.set("paystack_ref", response.reference);
+          body.set("consent", consent ? "true" : "false");
+          body.set("_subject", "CTG Waitlist (Paid)");
 
-      if (response.ok) {
+          await fetch("https://formspree.io/f/mdkwzdzn", {
+            method: "POST",
+            body,
+            headers: { Accept: "application/json" },
+          });
+
+          // Redirect with reference
+          window.location.href = `/thank-you?ref=${encodeURIComponent(response.reference)}`;
+        } catch (error) {
+          toast({
+            title: "Something went wrong",
+            description: "Payment successful but submission failed. Please contact support.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+        }
+      },
+      onClose: () => {
+        // Payment cancelled
         toast({
-          title: "Welcome to the Waitlist! 🎉",
-          description: "Check your email for next steps.",
+          title: "Payment cancelled",
+          description: "You can try again when you're ready.",
         });
-        
-        // Redirect to thank you page
-        setTimeout(() => {
-          window.location.href = "/thank-you";
-        }, 1500);
-      } else {
-        throw new Error("Submission failed");
-      }
-    } catch (error) {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again or contact us directly.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+        setIsSubmitting(false);
+      },
+    });
+
+    // Open Paystack modal
+    handler.openIframe();
   };
 
   return (

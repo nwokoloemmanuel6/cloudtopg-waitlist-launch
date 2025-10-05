@@ -17,6 +17,9 @@ import {
 import logo from "@/assets/logo.svg";
 import heroImage from "@/assets/hero-image.jpg";
 
+// Manually update this number when needed
+const MANUAL_SLOTS_AVAILABLE = 30;
+
 const Index = () => {
   const scrollToForm = () => {
     document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" });
@@ -93,7 +96,7 @@ const Index = () => {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
-                    <span className="text-sm font-medium text-primary">Only 30 Slots Available</span>
+                    <span className="text-sm font-medium text-primary">Only {MANUAL_SLOTS_AVAILABLE} Slots Available</span>
                   </div>
                 </div>
                 
