@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { ensurePaystackLoaded } from "@/lib/ensurePaystack";
+import { resolveConfig } from "@/lib/config";
 
 export const WaitlistForm = () => {
   const { toast } = useToast();
@@ -16,9 +17,8 @@ export const WaitlistForm = () => {
     phoneNumber: "+234",
   });
 
-  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string | undefined;
-  const FEE_NGN = Number(import.meta.env.VITE_FEE_NGN);
-  const AMOUNT_KOBO = Math.round((isFinite(FEE_NGN) ? FEE_NGN : 0) * 100);
+  const { paystackPublicKey, feeNgn, reason } = resolveConfig();
+  const AMOUNT_KOBO = Math.round((feeNgn ?? 0) * 100);
   const FALLBACK_PAYMENT_PAGE = import.meta.env.VITE_PAYSTACK_PAYMENT_PAGE as string | undefined;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -37,26 +37,36 @@ export const WaitlistForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Guard: Check if Paystack is configured
-      if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.trim() === "") {
-        console.error("Paystack public key not configured");
-        toast({
-          title: "Configuration Error",
-          description: "Payment system not configured. Please contact support.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (AMOUNT_KOBO <= 0) {
-        console.error("Invalid payment amount configured");
-        toast({
-          title: "Configuration Error",
-          description: "Payment amount not configured. Please contact support.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
+      // Guard: Check if Paystack is configured - graceful fallback
+      if (!paystackPublicKey || !(AMOUNT_KOBO > 0)) {
+        // dev-only helper
+        if (import.meta.env.DEV) {
+          console.warn("[Paystack] Config missing/invalid:", { reason });
+          toast({
+            title: "Payment not configured",
+            description: reason || "Using free waitlist mode",
+            variant: "default",
+          });
+        }
+        
+        // Graceful fallback: just do the Formspree submit and then thank-you
+        try {
+          const body = new FormData();
+          body.set("email", formData.email);
+          body.set("fullName", formData.fullName);
+          body.set("phoneNumber", formData.phoneNumber);
+          body.set("consent", consent ? "true" : "false");
+          body.set("_subject", "CTG Waitlist (No Payment)");
+          await fetch("https://formspree.io/f/mdkwzdzn", {
+            method: "POST",
+            body,
+            headers: { Accept: "application/json" }
+          });
+        } catch (e) {
+          console.warn("Formspree post failed (non-blocking):", e);
+        } finally {
+          window.location.href = `/thank-you?ref=pending`;
+        }
         return;
       }
 
@@ -102,7 +112,7 @@ export const WaitlistForm = () => {
 
       // Initialize Paystack
       const handler = window.PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
+        key: paystackPublicKey,
         email: formData.email,
         amount: AMOUNT_KOBO,
         currency: "NGN",

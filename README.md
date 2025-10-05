@@ -66,15 +66,31 @@ This project integrates Paystack for collecting waitlist application fees.
 
 ### Environment Setup
 
-Create a `.env` file in the root directory (based on `.env.example`):
+Set these environment variables in your `.env` file, GitHub Actions secrets, or Lovable Project Settings:
 
 ```env
 VITE_PAYSTACK_PUBLIC_KEY=pk_live_a1b065ab9ff7a77972b50678d8211d74ea80a767
 VITE_FEE_NGN=15000
+# Optional: fallback redirect if inline blocked in sandbox
+VITE_PAYSTACK_PAYMENT_PAGE=https://paystack.shop/pay/c26-waitlist
 ```
 
 - `VITE_PAYSTACK_PUBLIC_KEY`: Your Paystack public key (safe for frontend use)
 - `VITE_FEE_NGN`: Application fee amount in Nigerian Naira
+- `VITE_PAYSTACK_PAYMENT_PAGE`: Optional fallback payment page URL
+
+**Note:** The config resolver also supports these alternative env variable names for preview environments:
+- `PAYSTACK_PUBLIC_KEY` (without VITE_ prefix)
+- `LOVABLE_PAYSTACK_PUBLIC_KEY` (Lovable secret name)
+- `FEE_NGN` (without VITE_ prefix)
+
+### Graceful Fallback
+
+If Paystack configuration is missing or invalid:
+- In development: A small toast notification will appear
+- The form will fall back to Formspree-only submission (no payment)
+- User will be redirected to `/thank-you?ref=pending`
+- The submit button will never get stuck in "Joining..." state
 
 ### Manual Slot Counter
 
